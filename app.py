@@ -7,9 +7,9 @@ import json
 mysql = mysql.connector.connect(user='web', password='webPass',
   host='127.0.0.1',
   database='student')
-
+ 
 from logging.config import dictConfig
-
+ 
 dictConfig({
     'version': 1,
     'formatters': {'default': {
@@ -29,16 +29,15 @@ app = Flask(__name__)
 CORS(app)
 # My SQL Instance configurations
 # Change the HOST IP and Password to match your instance configurations
-
+ 
 @app.route("/test")#URL leading to method
 def test(): # Name of the method
- return("Hello World!<BR/>THIS IS ANOTHER TEST!") #indent this line
-
+return("Hello World!<BR/>THIS IS ANOTHER TEST!") #indent this line
+ 
 @app.route("/yest")#URL leading to method
 def yest(): # Name of the method
- return("Hello World!<BR/>THIS IS YET ANOTHER TEST!") #indent this line
-
-# route for add
+return("Hello World!<BR/>THIS IS YET ANOTHER TEST!") #indent this line
+ 
 @app.route("/add", methods=['GET', 'POST']) #Add Student
 def add():
   if request.method == 'POST':
@@ -52,8 +51,24 @@ def add():
     mysql.commit()
   else:
     return render_template('add.html')
-
+ 
   return '{"Result":"Success"}'
+@app.route("/update", methods=['GET', 'POST']) # Update Student
+def update():
+    if request.method == 'POST':
+        studentID = request.form['ID']
+        new_name = request.form['new_name']
+        new_email = request.form['new_email']
+ 
+        cur = mysql.cursor()
+        s = '''UPDATE students SET studentName = '{}', email = '{}' WHERE studentID = {};'''.format(new_name, new_email, studentID)
+        app.logger.info(s)
+        cur.execute(s)
+        mysql.commit()
+ 
+        return '{"Result":"Success"}'
+    else:
+        return render_template('update.html')
 @app.route("/") #Default - Show Data
 def hello(): # Name of the method
   cur = mysql.cursor() #create a connection to the SQL instance
